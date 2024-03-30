@@ -1,15 +1,38 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { randomBytes } from 'crypto';
+import { PrismaClient, User } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 const clientId = 'lbupensyhm1cb4hro58k5u2kldby1n'
 const clientSecret = 'e731hk3ou7iocdcxdql188ayikzc37'
 
 export async function GET(request: NextRequest) {
     const code = request.nextUrl.searchParams.get('code') || ''
-    const user = await getTwitchUser(code)
+    const rawUser = await getTwitchUser(code)
+
+    const user: Omit<User, 'id'> = {
+        twitch_id: rawUser.id,
+        login            : rawUser.login ,
+        display_name     : rawUser.display_name ,
+        type             : rawUser.type ,
+        broadcaster_type : rawUser.broadcaster_type ,
+        description      : rawUser.description ,
+        profile_image_url: rawUser.profile_image_url ,
+        offline_image_url: rawUser.offline_image_url ,
+        email            : rawUser.email ,
+        created_at: rawUser.created_at
+    }
 
     // TODO: Add user to DB
+    const newUser = await prisma.user.create({
+        data: user,
+    })
+    console.log('newUser', newUser)
+      
+    const users = await prisma.user.findMany()
+    console.log('users',users)
 
     // Set session token
     const sessionToken = randomBytes(16).toString('base64')
@@ -50,6 +73,5 @@ async function getTwitchUser(code: string) {
         }
     })
     const twitchUserJson = await twitchUser.json()
-
-    return twitchUserJson
+    return twitchUserJson.data[0]
 }

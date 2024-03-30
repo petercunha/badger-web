@@ -1,0 +1,23 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                Int      @id @default(autoincrement())
+  twitch_id         String   @unique
+  login             String
+  display_name      String
+  type              String
+  broadcaster_type  String
+  description       String
+  profile_image_url String
+  offline_image_url String
+  email             String
+  created_at        DateTime
+}
