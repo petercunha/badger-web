@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { randomBytes } from 'crypto';
 import { PrismaClient, Session, User } from '@prisma/client'
 
@@ -36,9 +36,11 @@ export async function GET(request: NextRequest) {
     setCookies(user, session)
 
     // Success
-    return new Response(`Welcome ${user.display_name}! Your session is ${JSON.stringify(session, null, 2)}`, {
-        status: 200,
-    });
+    return NextResponse.redirect(new URL('/dashboard', request.url))
+    
+    // return new Response(`Welcome ${user.display_name}! Your session is ${JSON.stringify(session, null, 2)}`, {
+    //     status: 200,
+    // });
 }
 
 function setCookies(user: User, session: Session) {
