@@ -1,12 +1,13 @@
 import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 import { randomBytes } from 'crypto';
-import { PrismaClient, User } from '@prisma/client'
+import { PrismaClient, Session, User } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
 const clientId = 'lbupensyhm1cb4hro58k5u2kldby1n'
 const clientSecret = 'e731hk3ou7iocdcxdql188ayikzc37'
+const sessionLengthDays = 7
 
 export async function GET(request: NextRequest) {
     const code = request.nextUrl.searchParams.get('code') || ''
@@ -19,24 +20,33 @@ export async function GET(request: NextRequest) {
         create: { ...twitchUser },
     })
 
-    // TODO: Create session in DB
+    // Create session in DB
+    const token = randomBytes(16).toString('base64')
+    const expires = new Date()
+    expires.setDate(expires.getDate() + sessionLengthDays)
+    const session = await prisma.session.create({
+        data: {
+            userId: user.id,
+            token: token,
+            expires: expires.toISOString()
+        }
+    })
 
     // Set user and session cookies
-    setCookies(user)
+    setCookies(user, session)
 
     // Success
-    return new Response(`Welcome ${user.display_name}!`, {
+    return new Response(`Welcome ${user.display_name}! Your session is ${JSON.stringify(session, null, 2)}`, {
         status: 200,
     });
 }
 
-function setCookies(user: User) {
-    const sessionToken = randomBytes(16).toString('base64')
+function setCookies(user: User, session: Session) {
     const cookieSecure = process.env.NODE_ENV === 'production'
-    const cookieAge = 60 * 60 * 24 * 7
+    const cookieAge = 60 * 60 * 24 * sessionLengthDays
 
     // Set session token (TODO: Add to DB)
-    cookies().set('session', sessionToken, {
+    cookies().set('session', session.token, {
         httpOnly: true,
         secure: cookieSecure,
         maxAge: cookieAge,

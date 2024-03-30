@@ -9,8 +9,8 @@ generator client {
 }
 
 model User {
-  id                Int      @id @default(autoincrement())
-  twitch_id         String   @unique
+  id                Int       @id @default(autoincrement())
+  twitch_id         String    @unique
   login             String
   display_name      String
   type              String
@@ -20,4 +20,13 @@ model User {
   offline_image_url String
   email             String
   created_at        DateTime
+  Session           Session[]
+}
+
+model Session {
+  id      Int      @id @default(autoincrement())
+  userId  Int
+  token   String
+  expires DateTime
+  user    User     @relation(fields: [userId], references: [id])
 }
