@@ -1,9 +1,8 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { randomBytes } from 'crypto';
-import { PrismaClient, Session, User } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { Session, User } from '@prisma/client'
+import prisma from '@/db'
 
 const clientId = 'lbupensyhm1cb4hro58k5u2kldby1n'
 const clientSecret = 'e731hk3ou7iocdcxdql188ayikzc37'
@@ -37,7 +36,7 @@ export async function GET(request: NextRequest) {
 
     // Success
     return NextResponse.redirect(new URL('/dashboard', request.url))
-    
+
     // return new Response(`Welcome ${user.display_name}! Your session is ${JSON.stringify(session, null, 2)}`, {
     //     status: 200,
     // });
