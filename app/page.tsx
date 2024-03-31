@@ -16,7 +16,7 @@ export default function Home() {
 
 function AuthLink() {
   const CLIENT_ID = 'lbupensyhm1cb4hro58k5u2kldby1n'
-  const CALLBACK_URL = `${window.location.protocol + '//' + window.location.host}/api/auth`
+  const CALLBACK_URL = `${typeof window !== "undefined" ? window.location.protocol + '//' + window.location.host : 'https://badger-web.vercel.app'}/api/auth`
   const PERMISSIONS = 'user:read:email'
   const TWITCH_AUTH_URL = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${CALLBACK_URL}&scope=${PERMISSIONS}`
 
