@@ -1,29 +1,28 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 // import { getSession } from './middleware_is_bullshit'
 
 export async function middleware(request: NextRequest) {
-  const sessionToken = request.cookies.get('session')
+  const sessionToken = request.cookies.get("session");
 
   // Dashboard
-  if (request.nextUrl.pathname.startsWith('/dashboard')) {
+  if (request.nextUrl.pathname.startsWith("/dashboard")) {
     if (!sessionToken) {
-      return NextResponse.redirect(new URL('/', request.url))
+      return NextResponse.redirect(new URL("/", request.url));
     }
   }
 
   // Home
-  if (request.nextUrl.pathname === '/') {
+  if (request.nextUrl.pathname === "/") {
     if (sessionToken) {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
+      return NextResponse.redirect(new URL("/dashboard", request.url));
     }
   }
 }
- 
-export const config = {
-  matcher: '/:path*',
-}
 
+export const config = {
+  matcher: "/:path*",
+};
 
 // export async function middleware(request: NextRequest) {
 //   const sessionToken = request.cookies.get('session')
